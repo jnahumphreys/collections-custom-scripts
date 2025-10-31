@@ -21,9 +21,11 @@ if (!game) {
 
 const timeToBeat = app.library.timeToBeat(queryID);
 
-const builder = app.document.builder();
-
 function buildGame() {
+
+  const builder = app.document.builder();
+
+  game.parentId ? builder.setEntity("DLC") : builder.setEntity("Main game");
 
   builder.setString(game.name, "title");
   builder.setImage(game.requestCover(), "cover");
@@ -35,7 +37,6 @@ function buildGame() {
   builder.setListItems(game.collections, "series");
   builder.setInteger(timeToBeat, "time-to-beat");
   builder.setString(game.url, "igdb-url");
-  builder.setIdentifier("igdb-id");
   
   if(!app.currentDocument) {
     builder.setListItem(app.listItem.suggest("backlog", "Backlog"), "status");
@@ -43,10 +44,8 @@ function buildGame() {
     game.parentId && builder.setInteger(game.parentId, "igdb-parent-id");
   }
 
-  game.parentId ? builder.setEntity("DLC") : builder.setEntity("Main game")
+  return builder;
 
 }
 
-buildGame();
-
-app.result(builder);
+app.result(buildGame());
