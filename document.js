@@ -19,13 +19,13 @@ if (!game) {
   app.fail();
 }
 
-const timeToBeat = app.library.timeToBeat(queryID);
-
-function buildGame() {
+function buildGame(game) {
 
   const builder = app.document.builder();
 
-  game.parentId ? builder.setEntity("DLC") : builder.setEntity("Main game");
+  builder.setIdentifier("igdb-id");
+
+  const timeToBeat = app.library.timeToBeat(game.id);
 
   builder.setString(game.name, "title");
   builder.setImage(game.requestCover(), "cover");
@@ -37,15 +37,32 @@ function buildGame() {
   builder.setListItems(game.collections, "series");
   builder.setInteger(timeToBeat, "time-to-beat");
   builder.setString(game.url, "igdb-url");
-  
-  if(!app.currentDocument) {
-    builder.setListItem(app.listItem.suggest("backlog", "Backlog"), "status");
-    builder.setInteger(game.id, "igdb-id");
-    game.parentId && builder.setInteger(game.parentId, "igdb-parent-id");
-  }
+  builder.setListItem(app.listItem.suggest("backlog", "Backlog"), "status");
+  builder.setInteger(game.id, "igdb-id");
+  game.parentId && builder.setInteger(game.parentId, "igdb-parent-id");
+  game.parentId ? builder.setEntity("DLC") : builder.setEntity("Main game");
 
   return builder;
 
 }
 
-app.result(buildGame());
+  if(game.parentId) {
+
+    const parentGame = app.api.igdb.getGame(game.parentId);
+
+    if (!parentGame) {
+      app.fail();
+    }
+
+    const parentBuilder = buildGame(parentGame);
+
+    const childBuilder = buildGame(game);
+
+    childBuilder.setParent(parentBuilder);
+
+    app.result(childBuilder);
+
+  } else {
+    app.result(buildGame(game));
+  }
+
