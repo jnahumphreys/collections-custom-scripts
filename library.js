@@ -23,6 +23,12 @@ app.library.collections.game = class extends app.classes.api.igdb.game {
 		return this.data.platforms.map(({ name, slug }) => app.listItem.suggest(slug, name));
 	}
 
+	get playedPlatform() {
+		if (!this.data.platforms) return [];
+		const {slug, name} = this.data.platforms[0];
+		return app.listItem.suggest(slug, name);
+	}
+
 	get storyline() {
 		if (!this.data.storyline) return;
 		return this.data.storyline;
