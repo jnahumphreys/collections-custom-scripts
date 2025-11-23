@@ -30,6 +30,7 @@ function buildGame(game) {
   builder.setString(game.name, "title");
   builder.setImage(game.requestCover(), "cover");
   builder.setDate(game.firstReleaseDate, "first-release-date");
+  builder.setListItem(game.playedPlatform, "played-platform");
   builder.setListItems(game.platforms, "release-platforms");
   builder.setListItem(game.type, "game-type");
   builder.setListItems(game.genres, "genres");
